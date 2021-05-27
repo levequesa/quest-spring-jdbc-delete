@@ -18,7 +18,25 @@ public class SchoolRepository {
     private final static String DB_PASSWORD = "Horcrux4life!";
 
     public void deleteById(Long id) {
-        // TODO: delete a school from the database
+
+    	Connection connection = null;
+    	PreparedStatement request = null;
+    	ResultSet result = null;
+    	
+    	try {
+			connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+			request = connection.prepareStatement("DELETE FROM school where id=?");
+			request.setLong(1, id);
+			if (request.executeUpdate() !=1 ) {
+				throw new SQLException("failed to delete data");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JdbcUtils.closeResultSet(result);
+			JdbcUtils.closeStatement(request);
+			JdbcUtils.closeConnection(connection);
+		}
     }
 
     public List<School> findAll() {
@@ -35,7 +53,7 @@ public class SchoolRepository {
             );
             resultSet = statement.executeQuery();
 
-            List<School> schools = new ArrayList<>();
+            List<School> schools = new ArrayList<School>();
 
             while (resultSet.next()) {
                 Long id = resultSet.getLong("id");
